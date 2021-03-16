@@ -1,35 +1,32 @@
-/* Sweep
-  by BARRAGAN <http://barraganstudio.com>
-  This example code is in the public domain.
-
-  modified 28 May 2015
-  by Michael C. Miller
-  modified 8 Nov 2013
-  by Scott Fitzgerald
-
-  http://arduino.cc/en/Tutorial/Sweep
-*/
-
-#include <Servo.h>
-
-Servo myservo;  // create servo object to control a servo
-// twelve servo objects can be created on most boards
-
-
+#include <AccelStepper.h>
+// Motor pin definitions:
+#define motorPin1  5      // IN1 on the ULN2003 driver
+#define motorPin2  4      // IN2 on the ULN2003 driver
+#define motorPin3  0     // IN3 on the ULN2003 driver
+#define motorPin4  2     // IN4 on the ULN2003 driver
+// Define the AccelStepper interface type; 4 wire motor in half step mode:
+#define MotorInterfaceType 8
+// Initialize with pin sequence IN1-IN3-IN2-IN4 for using the AccelStepper library with 28BYJ-48 stepper motor:
+AccelStepper stepper = AccelStepper(MotorInterfaceType, motorPin1, motorPin3, motorPin2, motorPin4);
+int a=200;
 void setup() {
-  myservo.attach(5);  // attaches the servo on GIO2 to the servo object
+  // Set the maximum steps per second:
+  stepper.setMaxSpeed(2000);
+  // Set the maximum acceleration in steps per second^2:
+  stepper.setAcceleration(a);
 }
-
 void loop() {
-  int pos;
-
-  for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15ms for the servo to reach the position
-  }
-  for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15ms for the servo to reach the position
-  }
+  // Set target position:
+  stepper.moveTo(8192);
+  // Run to position with set speed and acceleration:
+  stepper.runToPosition();
+  
+  delay(1000);
+  
+  // Move back to original position:
+  stepper.moveTo(0);
+  // Run to position with set speed and acceleration:
+  stepper.runToPosition();
+  
+  delay(1000);
 }
